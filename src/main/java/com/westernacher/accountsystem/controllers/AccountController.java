@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+import static com.westernacher.accountsystem.utils.ExceptionUtils.ACCOUNT_NOT_FOUND;
+
 @RestController
 @RequestMapping("/accounts")
 public class AccountController {
@@ -32,7 +34,7 @@ public class AccountController {
     public Account getAccount(@PathVariable String id) {
         Optional<Account> optionalAccount = accountRepository.findById(id);
         if (!optionalAccount.isPresent()) {
-            throw new AccountNotFoundException("Account with ID: " + id + " not found!");
+            throw new AccountNotFoundException(ACCOUNT_NOT_FOUND + id);
         }
         return optionalAccount.get();
     }
@@ -41,7 +43,7 @@ public class AccountController {
     public ResponseEntity<Account> editAccount(@PathVariable String id, @RequestBody Account account) {
         Optional<Account> optionalAccount = accountRepository.findById(id);
         if (!optionalAccount.isPresent()) {
-            throw new AccountNotFoundException("Account with ID: " + id + " not found!");
+            throw new AccountNotFoundException(ACCOUNT_NOT_FOUND + id);
         }
         Account acc = optionalAccount.get();
         acc.setFirstName(account.getFirstName());
@@ -52,14 +54,14 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).body(acc);
     }
 
-    @DeleteMapping("/{id]")
-    public ResponseEntity<Account> deleteAccount(@PathVariable String id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteAccount(@PathVariable String id) {
         Optional<Account> optionalAccount = accountRepository.findById(id);
         if (!optionalAccount.isPresent()) {
-            throw new AccountNotFoundException("Account with ID: " + id + " not found!");
+            throw new AccountNotFoundException(ACCOUNT_NOT_FOUND + id);
         }
         Account acc = optionalAccount.get();
         accountRepository.delete(acc);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(acc);
+        return ResponseEntity.status(HttpStatus.OK).body("Account with ID: " + id +" deleted!");
     }
 }
